@@ -1,4 +1,4 @@
-package com.gypsyengineer.ql.test.virtual;
+package com.gypsyengineer.ql.fun.virtual;
 
 import lombok.RequiredArgsConstructor;
 

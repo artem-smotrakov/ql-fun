@@ -1,4 +1,4 @@
-package com.gypsyengineer.spel;
+package com.gypsyengineer.ql.fun.spel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
