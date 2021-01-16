@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-public class RunProcessWithJexl3 {
+public class UnsafeJexl3 {
 
     public static void main(String... args) throws Exception {
         runJexlExpressionWithSandbox("''.getClass().forName('java.lang.Runtime').getRuntime().exec('gedit')");
@@ -24,7 +24,7 @@ public class RunProcessWithJexl3 {
 
     private static void runJexlExpressionWithSandbox(String jexlExpr) {
         JexlSandbox sandbox = new JexlSandbox(false);
-        sandbox.white(RunProcessWithJexl3.class.getCanonicalName());
+        sandbox.white(UnsafeJexl3.class.getCanonicalName());
         JexlEngine jexl = new JexlBuilder().sandbox(sandbox).create();
         JexlExpression e = jexl.createExpression(jexlExpr);
         JexlContext jc = new MapContext();
@@ -104,7 +104,7 @@ public class RunProcessWithJexl3 {
         jxlt.createTemplate(jexlExpr).evaluate(new MapContext(), new StringWriter());
     }
 
-    private static void testWithSocket(Consumer<String> action) throws Exception {
+    private static void withSocket(Consumer<String> action) throws Exception {
         try (ServerSocket serverSocket = new ServerSocket(0)) {
             try (Socket socket = serverSocket.accept()) {
                 byte[] bytes = new byte[1024];
@@ -115,54 +115,54 @@ public class RunProcessWithJexl3 {
         }
     }
 
-    // below are tests for the query
+    // // below are examples of unsafe Jexl usage
 
-    public static void testWithJexlExpressionEvaluate() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpression);
+    public static void unsafeJexlExpressionEvaluate() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpression);
     }
 
-    public static void testWithJexlExpressionEvaluateWithInfo() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionWithJexlInfo);
+    public static void unsafeJexlExpressionEvaluateWithInfo() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionWithJexlInfo);
     }
 
-    public static void testWithJexlScriptExecute() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlScript);
+    public static void unsafeJexlScriptExecute() throws Exception {
+        withSocket(UnsafeJexl3::runJexlScript);
     }
 
-    public static void testWithJexlScriptCallable() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlScriptViaCallable);
+    public static void unsafeJexlScriptCallable() throws Exception {
+        withSocket(UnsafeJexl3::runJexlScriptViaCallable);
     }
 
-    public static void testWithJexlEngineGetProperty() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionViaGetProperty);
+    public static void unsafeJexlEngineGetProperty() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionViaGetProperty);
     }
 
-    public static void testWithJexlEngineSetProperty() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionViaSetProperty);
+    public static void unsafeJexlEngineSetProperty() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionViaSetProperty);
     }
 
-    public static void testWithJxltEngineExpressionEvaluate() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionViaJxltEngineExpressionEvaluate);
+    public static void unsafeJxltEngineExpressionEvaluate() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionViaJxltEngineExpressionEvaluate);
     }
 
-    public static void testWithJxltEngineExpressionPrepare() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionViaJxltEngineExpressionPrepare);
+    public static void unsafeJxltEngineExpressionPrepare() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionViaJxltEngineExpressionPrepare);
     }
 
-    public static void testWithJxltEngineTemplateEvaluate() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionViaJxltEngineTemplateEvaluate);
+    public static void unsafeJxltEngineTemplateEvaluate() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionViaJxltEngineTemplateEvaluate);
     }
 
-    public static void testWithJexlExpressionCallable() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionViaCallable);
+    public static void unsafeJexlExpressionCallable() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionViaCallable);
     }
 
-    public static void testWithJexlExpressionInSandbox() throws Exception {
-        testWithSocket(RunProcessWithJexl3::runJexlExpressionWithSandbox);
+    public static void unsafeJexlExpressionInSandbox() throws Exception {
+        withSocket(UnsafeJexl3::runJexlExpressionWithSandbox);
     }
 
     @PostMapping("/request")
-    public ResponseEntity testSpringControllerThatEvaluatesJexlFromPathVariable(
+    public ResponseEntity unsafeSpringControllerThatEvaluatesJexlFromPathVariable(
             @PathVariable String expr) {
 
         runJexlExpression(expr);
@@ -170,7 +170,7 @@ public class RunProcessWithJexl3 {
     }
 
     @PostMapping("/request")
-    public ResponseEntity testSpringControllerThatEvaluatesJexlFromRequestBody(
+    public ResponseEntity unsafeSpringControllerThatEvaluatesJexlFromRequestBody(
             @RequestBody Data data) {
 
         String expr = data.getExpr();
@@ -180,7 +180,7 @@ public class RunProcessWithJexl3 {
     }
 
     @PostMapping("/request")
-    public ResponseEntity testSpringControllerThatEvaluatesJexlFromRequestBodyWithNestedObjects(
+    public ResponseEntity unsafeSpringControllerThatEvaluatesJexlFromRequestBodyWithNestedObjects(
             @RequestBody CustomRequest customRequest) {
 
         String expr = customRequest.getData().getExpr();
