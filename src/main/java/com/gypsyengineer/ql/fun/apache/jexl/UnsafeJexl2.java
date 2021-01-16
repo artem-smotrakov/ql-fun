@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.Consumer;
 
-public class RunProcessWithJexl2 {
+public class UnsafeJexl2 {
 
     public static void main(String... args) throws Exception {
         //runJexlExpression("''.getClass().forName('java.lang.Runtime').getRuntime().exec('gedit')");
@@ -77,7 +77,7 @@ public class RunProcessWithJexl2 {
         unifiedJEXL.createTemplate(jexlExpr).evaluate(new MapContext(), new StringWriter());
     }
 
-    private static void testWithSocket(Consumer<String> action) throws Exception {
+    private static void simpleServer(Consumer<String> action) throws Exception {
         try (ServerSocket serverSocket = new ServerSocket(0)) {
             try (Socket socket = serverSocket.accept()) {
                 byte[] bytes = new byte[1024];
@@ -88,41 +88,41 @@ public class RunProcessWithJexl2 {
         }
     }
 
-    // below are tests for the query
+    // below are examples of unsafe Jexl usage
 
-    public static void testWithJexlExpressionEvaluate() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpression);
+    public static void unsafeJexlExpressionEvaluate() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpression);
     }
 
-    public static void testWithJexlExpressionEvaluateWithInfo() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpressionWithJexlInfo);
+    public static void unsafeJexlExpressionEvaluateWithInfo() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpressionWithJexlInfo);
     }
 
-    public static void testWithJexlScriptExecute() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlScript);
+    public static void unsafeJexlScriptExecute() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlScript);
     }
 
-    public static void testWithJexlScriptCallable() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlScriptViaCallable);
+    public static void unsafeJexlScriptCallable() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlScriptViaCallable);
     }
 
-    public static void testWithJexlEngineGetProperty() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpressionViaGetProperty);
+    public static void unsafeJexlEngineGetProperty() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpressionViaGetProperty);
     }
 
-    public static void testWithJexlEngineSetProperty() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpressionViaSetProperty);
+    public static void unsafeJexlEngineSetProperty() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpressionViaSetProperty);
     }
 
-    public static void testWithUnifiedJEXLParseAndEvaluate() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpressionViaUnifiedJEXLParseAndEvaluate);
+    public static void unsafeUnifiedJEXLParseAndEvaluate() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpressionViaUnifiedJEXLParseAndEvaluate);
     }
 
-    public static void testWithUnifiedJEXLParseAndPrepare() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpressionViaUnifiedJEXLParseAndPrepare);
+    public static void unsafeUnifiedJEXLParseAndPrepare() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpressionViaUnifiedJEXLParseAndPrepare);
     }
 
-    public static void testWithUnifiedJEXLTemplateEvaluate() throws Exception {
-        testWithSocket(RunProcessWithJexl2::runJexlExpressionViaUnifiedJEXLTemplateEvaluate);
+    public static void unsafeUnifiedJEXLTemplateEvaluate() throws Exception {
+        simpleServer(UnsafeJexl2::runJexlExpressionViaUnifiedJEXLTemplateEvaluate);
     }
 }
