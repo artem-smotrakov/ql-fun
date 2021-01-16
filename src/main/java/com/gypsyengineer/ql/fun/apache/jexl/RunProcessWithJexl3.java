@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.function.Consumer;
 
 import org.apache.commons.jexl3.*;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class RunProcessWithJexl3 {
 
     public static void main(String... args) throws Exception {
-        runJexlExpressionViaCallable("''.getClass().forName('java.lang.Runtime').getRuntime().exec('gedit')");
+        runJexlExpressionWithSandbox("''.getClass().forName('java.lang.Runtime').getRuntime().exec('gedit')");
+        //runJexlExpressionViaCallable("''.getClass().forName('java.lang.Runtime').getRuntime().exec('gedit')");
         //runJexlExpressionViaGetProperty("class.forName('java.lang.Runtime').getRuntime().exec('gedit')");
         //runJexlExpressionViaJxltEngineExpressionPrepare("${''.getClass().forName('java.lang.Runtime').getRuntime().exec('gedit')}");
+    }
+
+    private static void runJexlExpressionWithSandbox(String jexlExpr) {
+        JexlSandbox sandbox = new JexlSandbox(false);
+        sandbox.white(RunProcessWithJexl3.class.getCanonicalName());
+        JexlEngine jexl = new JexlBuilder().sandbox(sandbox).create();
+        JexlExpression e = jexl.createExpression(jexlExpr);
+        JexlContext jc = new MapContext();
+        e.evaluate(jc);
     }
 
     private static void runJexlExpression(String jexlExpr) {
@@ -144,6 +155,10 @@ public class RunProcessWithJexl3 {
 
     public static void testWithJexlExpressionCallable() throws Exception {
         testWithSocket(RunProcessWithJexl3::runJexlExpressionViaCallable);
+    }
+
+    public static void testWithJexlExpressionInSandbox() throws Exception {
+        testWithSocket(RunProcessWithJexl3::runJexlExpressionWithSandbox);
     }
 
     @PostMapping("/request")
