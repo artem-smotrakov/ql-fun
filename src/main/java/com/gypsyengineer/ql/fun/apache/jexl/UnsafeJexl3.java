@@ -3,10 +3,14 @@ package com.gypsyengineer.ql.fun.apache.jexl;
 import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.AccessControlException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.commons.jexl3.*;
-import org.apache.commons.jexl3.introspection.JexlSandbox;
+import org.apache.commons.jexl3.introspection.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +33,80 @@ public class UnsafeJexl3 {
         JexlExpression e = jexl.createExpression(jexlExpr);
         JexlContext jc = new MapContext();
         e.evaluate(jc);
+    }
+
+    private static void runJexlExpressionWithUberspectSandbox(String jexlExpr) {
+        JexlUberspect sandbox = new JexlUberspectSandbox();
+        JexlEngine jexl = new JexlBuilder().uberspect(sandbox).create();
+        JexlExpression e = jexl.createExpression(jexlExpr);
+        JexlContext jc = new MapContext();
+        e.evaluate(jc);
+    }
+
+    private static class JexlUberspectSandbox implements JexlUberspect {
+
+        private static final List<String> ALLOWED_CLASSES =
+                Arrays.asList("java.lang.Math", "java.util.Random");
+
+        private final JexlUberspect uberspect = new JexlBuilder().create().getUberspect();
+
+        @Override
+        public JexlMethod getMethod(Object obj, String method, Object... args) {
+            if (!ALLOWED_CLASSES.contains(obj.getClass().getCanonicalName())) {
+                throw new AccessControlException("Not allowed");
+            }
+            return uberspect.getMethod(obj, method, args);
+        }
+
+        @Override
+        public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
+            return uberspect.getResolvers(op, obj);
+        }
+
+        @Override
+        public void setClassLoader(ClassLoader loader) {
+            uberspect.setClassLoader(loader);
+        }
+
+        @Override
+        public int getVersion() {
+            return uberspect.getVersion();
+        }
+
+        @Override
+        public JexlMethod getConstructor(Object ctorHandle, Object... args) {
+            return uberspect.getConstructor(ctorHandle, args);
+        }
+
+        @Override
+        public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
+            return uberspect.getPropertyGet(obj, identifier);
+        }
+
+        @Override
+        public JexlPropertyGet getPropertyGet(List<PropertyResolver> resolvers, Object obj, Object identifier) {
+            return uberspect.getPropertyGet(resolvers, obj, identifier);
+        }
+
+        @Override
+        public JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg) {
+            return uberspect.getPropertySet(obj, identifier, arg);
+        }
+
+        @Override
+        public JexlPropertySet getPropertySet(List<PropertyResolver> resolvers, Object obj, Object identifier, Object arg) {
+            return uberspect.getPropertySet(resolvers, obj, identifier, arg);
+        }
+
+        @Override
+        public Iterator<?> getIterator(Object obj) {
+            return uberspect.getIterator(obj);
+        }
+
+        @Override
+        public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+            return uberspect.getArithmetic(arithmetic);
+        }
     }
 
     private static void runJexlExpression(String jexlExpr) {
