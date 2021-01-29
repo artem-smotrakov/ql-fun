@@ -58,6 +58,26 @@
           <artifactId>mvel2</artifactId>
           <version>2.4.7.Final</version>
       </dependency>
+      <dependency>
+          <groupId>javax.el</groupId>
+          <artifactId>javax.el-api</artifactId>
+          <version>3.0.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.glassfish.web</groupId>
+          <artifactId>el-impl</artifactId>
+          <version>2.2</version>
+      </dependency>
+      <dependency>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-api</artifactId>
+          <version>2.2.7</version>
+      </dependency>
+      <dependency>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-impl</artifactId>
+          <version>2.2.7</version>
+      </dependency>
   </dependencies>
 
   <build>
