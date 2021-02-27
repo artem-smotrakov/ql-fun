@@ -19,9 +19,9 @@ public class UnsafeJuel {
         //runLambdaExpression("${1+2}");
         //createFactoryWithElManagerSetVariable("${1+2}");
         //runJuelMethodExpressionInvoke(PAYLOAD);
-        //runJuelMethodExpressionMethodInfo(PAYLOAD);
+        runJuelValueExpressionGetValue(PAYLOAD);
     }
-
+/**
     // sink ELProcessor.eval()
     private static void runExpressionViaELProcessorEval(String expression) {
         ELProcessor processor = new ELProcessor();
@@ -71,7 +71,7 @@ public class UnsafeJuel {
         manager.setVariable("test", factory.createValueExpression(context, expression, Object.class));
         System.out.println(factory.createValueExpression(context, "${test}", Object.class).getValue(context));
     }
-
+*/
     // JUEL
 
     // only getValue() and setValue() seem to trigger evaluation
@@ -104,7 +104,7 @@ public class UnsafeJuel {
         MethodExpression e = factory.createMethodExpression(context, expression, Object.class, new Class[0]);
         System.out.println(e.getMethodInfo(context));
     }
-
+/*
     // tests for the query
 
     private static void withSocket(Consumer<String> action) throws Exception {
@@ -149,4 +149,5 @@ public class UnsafeJuel {
     private static void testWithJuelMethodExpressionInvoke() throws Exception {
         withSocket(UnsafeJuel::runJuelMethodExpressionInvoke);
     }
+ */
 }
