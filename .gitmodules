@@ -1,0 +1,3 @@
+[submodule "ysoserial"]
+	path = ysoserial
+	url = https://github.com/frohoff/ysoserial.git
