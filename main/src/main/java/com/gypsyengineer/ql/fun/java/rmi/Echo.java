@@ -20,7 +20,7 @@ public class Echo extends UnicastRemoteObject implements EchoInterface {
     }
 
     @Override
-    public int echoInt(Integer i) throws RemoteException {
+    public Integer echoInteger(Integer i) throws RemoteException {
         return i;
     }
 

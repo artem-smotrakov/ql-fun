@@ -9,5 +9,5 @@ interface EchoInterface extends Remote {
 
     String echoString(String str) throws RemoteException;
 
-    int echoInt(Integer i) throws RemoteException;
+    Integer echoInteger(Integer i) throws RemoteException;
 }
