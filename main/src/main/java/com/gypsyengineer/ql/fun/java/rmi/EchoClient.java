@@ -11,7 +11,7 @@ public class EchoClient {
     public static void main(String... args) throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
         EchoInterface echo = (EchoInterface) registry.lookup("echo");
-        System.out.println("echo.echoInt(42) = " + echo.echoInt(42));
+        System.out.println("echo.echoInt(42) = " + echo.echoInteger(42));
         System.out.println("echo.echoInt(\"xyz\") = " + echo.echoString("xyz"));
         Object o = new Serializable() {
             @Override
