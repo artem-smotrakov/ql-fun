@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 
+import java.io.IOException;
+
+import static com.gypsyengineer.ql.fun.Util.withSocket;
+
 public class SaferPersonDeserialization {
 
     private static final String command =
@@ -27,22 +31,32 @@ public class SaferPersonDeserialization {
                     + "   \"command\":\"" + command + "\""
                     + "}}";
 
-    public static void main(String[] args) throws Exception {
+    private static <T> T deserializeSafe(String string, Class<T> clazz) throws IOException {
         PolymorphicTypeValidator ptv =
                 BasicPolymorphicTypeValidator.builder()
-                        .allowIfSubType("com.gypsyengineer.jackson")
+                        .allowIfSubType("com.gypsyengineer")
                         .build();
         ObjectMapper mapper = JsonMapper.builder()
                 .polymorphicTypeValidator(ptv)
                 .build();
 
-        Person person = mapper.readValue(good, Person.class);
-        System.out.println(person.toString());
+        return mapper.readValue(string, clazz);
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(deserializeSafe(good, Person.class));
 
         try {
-            mapper.readValue(bad, Person.class);
+            deserializeSafe(bad, Person.class);
         } catch (Exception e) {
-            System.out.println("Deserialization failed: " + e);
+            System.out.println("Deserialization failed as expected: " + e);
         }
+    }
+
+    // tests for CodeQL
+
+    // GOOD
+    private static void testSafeDeserialization() throws Exception {
+        withSocket(input -> deserializeSafe(input, Person.class));
     }
 }
