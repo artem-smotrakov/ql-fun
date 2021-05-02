@@ -2,6 +2,10 @@ package com.gypsyengineer.ql.fun.jackson.one;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+
+import static com.gypsyengineer.ql.fun.Util.withSocket;
+
 public class UnsafePersonDeserialization {
 
     private static final String command =
@@ -16,9 +20,19 @@ public class UnsafePersonDeserialization {
                     + "   \"command\":\"" + command + "\""
                     + "}}";
 
-    public static void main(String[] args) throws Exception {
+    private static <T> T deserializeUnsafe(String string, Class<T> clazz) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        Person person = mapper.readValue(bad, Person.class);
-        System.out.println(person.toString());
+        return mapper.readValue(string, clazz);
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(deserializeUnsafe(bad, Person.class));
+    }
+
+    // tests for CodeQL
+
+    // BAD
+    private static void testUnsafeDeserialization() throws Exception {
+        withSocket(input -> deserializeUnsafe(input, Person.class));
     }
 }
