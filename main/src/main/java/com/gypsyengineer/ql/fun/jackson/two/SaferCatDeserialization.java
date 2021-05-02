@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 
+import java.io.IOException;
+
+import static com.gypsyengineer.ql.fun.Util.withSocket;
+
 public class SaferCatDeserialization {
 
     private static final String command =
@@ -14,33 +18,46 @@ public class SaferCatDeserialization {
     private static final String good =
             "{\"name\":\"Dude\"," +
                     "\"tag\":[" +
-                    "   \"com.gypsyengineer.jackson.unsafe.two.Tag\"," +
+                    "   \"com.gypsyengineer.ql.fun.jackson.two.Tag\"," +
                     "   {\"title\":\"123\"}" +
                     "]}";
 
     private static final String bad =
             "{\"name\":\"Dude\"," +
                     "\"tag\":[" +
-                    "   \"com.pupolar.lib.Exec\"," +
+                    "   \"com.popular.lib.Exec\"," +
                     "   {\"command\":\"" + command + "\"}" +
                     "]}";
 
-    public static void main(String[] args) throws Exception {
+    private static <T> T deserializeSafe(String string, Class<T> clazz) throws IOException {
         PolymorphicTypeValidator ptv =
                 BasicPolymorphicTypeValidator.builder()
-                        .allowIfSubType("com.gypsyengineer.jackson")
+                        .allowIfSubType("com.gypsyengineer")
                         .build();
         ObjectMapper mapper = JsonMapper.builder()
-                .activateDefaultTyping(ptv)
+                .polymorphicTypeValidator(ptv)
                 .build();
 
-        Cat cat = mapper.readValue(good, Cat.class);
-        System.out.println(cat.toString());
+        // this enables polymorphic type handling
+        mapper.enableDefaultTyping();
+
+        return mapper.readValue(string, clazz);
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(deserializeSafe(good, Cat.class));
 
         try {
-            mapper.readValue(bad, Cat.class);
+            System.out.println(deserializeSafe(bad, Cat.class));
         } catch (Exception e) {
             System.out.println("Deserialization failed: " + e);
         }
+    }
+
+    // tests for CodeQL
+
+    // GOOD
+    private static void testUnsafeDeserialization() throws Exception {
+        withSocket(input -> deserializeSafe(input, Cat.class));
     }
 }

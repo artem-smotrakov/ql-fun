@@ -40,8 +40,6 @@ public class SaferPersonDeserialization {
                 .polymorphicTypeValidator(ptv)
                 .build();
 
-        mapper.enableDefaultTyping();
-
         return mapper.readValue(string, clazz);
     }
 
