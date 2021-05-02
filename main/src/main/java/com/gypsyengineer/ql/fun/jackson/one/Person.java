@@ -9,7 +9,7 @@ public class Person {
     public String name;
     public int age;
 
-    // Using JsonTypeInfo.Id.CLASS enables polymorphic type handling.
+    // JsonTypeInfo.Id.CLASS enables polymorphic type handling
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
     public Object phone;
 
