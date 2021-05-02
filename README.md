@@ -1,2 +1,3 @@
 # ql-fun
-CodeQL queries with blackjack and hookers
+
+Examples of vulnerable code that can be detected by CodeQL queries.
