@@ -1,4 +1,4 @@
-package com.gypsyengineer.ql.fun.jackson.one;
+package com.gypsyengineer.ql.fun.jackson.two;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -9,27 +9,16 @@ import java.io.IOException;
 
 import static com.gypsyengineer.ql.fun.Util.withSocket;
 
-public class SaferPersonDeserialization {
+public class SafeCatDeserialization {
 
     private static final String command =
             System.getProperty("os.name").toLowerCase().contains("windows")
                     ? "calc.exe" : "gedit";
 
-    private static final String good =
-            "{\"name\":\"John Doe\"," +
-                    "\"age\":101," +
-                    "\"phone\":{" +
-                    "   \"@class\":\"com.gypsyengineer.ql.fun.jackson.one.DomesticNumber\"," +
-                    "   \"areaCode\":0," +
-                    "   \"local\":0}}";
-
     private static final String bad =
-            "{\"name\":\"Bender\","
-                    + "\"age\":101,"
-                    + "\"phone\":{"
-                    + "   \"@class\":\"com.popular.lib.Exec\","
-                    + "   \"command\":\"" + command + "\""
-                    + "}}";
+            "{\"name\":\"Dude\",\"tag\":[" +
+                    "\"com.popular.lib.Exec\"," +
+                    "{\"command\":\"" + command + "\"}]}";
 
     private static <T> T deserializeSafe(String string, Class<T> clazz) throws IOException {
         PolymorphicTypeValidator ptv =
@@ -40,16 +29,15 @@ public class SaferPersonDeserialization {
                 .polymorphicTypeValidator(ptv)
                 .build();
 
+        // this enables polymorphic type handling
         mapper.enableDefaultTyping();
 
         return mapper.readValue(string, clazz);
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(deserializeSafe(good, Person.class));
-
         try {
-            deserializeSafe(bad, Person.class);
+            deserializeSafe(bad, Cat.class);
         } catch (Exception e) {
             System.out.println("Deserialization failed as expected: " + e);
         }
@@ -58,7 +46,7 @@ public class SaferPersonDeserialization {
     // tests for CodeQL
 
     // GOOD
-    private static void testSafeDeserialization() throws Exception {
-        withSocket(input -> deserializeSafe(input, Person.class));
+    private static void testUnsafeDeserialization() throws Exception {
+        withSocket(input -> deserializeSafe(input, Cat.class));
     }
 }
