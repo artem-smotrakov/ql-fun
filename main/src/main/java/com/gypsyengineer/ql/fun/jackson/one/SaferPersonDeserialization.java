@@ -15,7 +15,7 @@ public class SaferPersonDeserialization {
             System.getProperty("os.name").toLowerCase().contains("windows")
                     ? "calc.exe" : "gedit";
 
-    private static final String good =
+    private static final String GOOD_PERSON =
             "{\"name\":\"John Doe\"," +
                     "\"age\":101," +
                     "\"phone\":{" +
@@ -23,7 +23,7 @@ public class SaferPersonDeserialization {
                     "   \"areaCode\":0," +
                     "   \"local\":0}}";
 
-    private static final String bad =
+    private static final String BAD_PERSON =
             "{\"name\":\"Bender\","
                     + "\"age\":101,"
                     + "\"phone\":{"
@@ -31,7 +31,7 @@ public class SaferPersonDeserialization {
                     + "   \"command\":\"" + command + "\""
                     + "}}";
 
-    private static <T> T deserializeSafe(String string, Class<T> clazz) throws IOException {
+    private static Person deserializePersonSafeWithValidatorAndBuilder(String string) throws IOException {
         PolymorphicTypeValidator ptv =
                 BasicPolymorphicTypeValidator.builder()
                         .allowIfSubType("com.gypsyengineer")
@@ -40,14 +40,25 @@ public class SaferPersonDeserialization {
                 .polymorphicTypeValidator(ptv)
                 .build();
 
-        return mapper.readValue(string, clazz);
+        return mapper.readValue(string, Person.class);
+    }
+
+    private static Person deserializePersonSafeWithValidator(String string) throws IOException {
+        PolymorphicTypeValidator ptv =
+                BasicPolymorphicTypeValidator.builder()
+                        .allowIfSubType("com.gypsyengineer")
+                        .build();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setPolymorphicTypeValidator(ptv);
+
+        return mapper.readValue(string, Person.class);
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(deserializeSafe(good, Person.class));
+        System.out.println(deserializePersonSafeWithValidatorAndBuilder(GOOD_PERSON));
 
         try {
-            deserializeSafe(bad, Person.class);
+            deserializePersonSafeWithValidatorAndBuilder(BAD_PERSON);
         } catch (Exception e) {
             System.out.println("Deserialization failed as expected: " + e);
         }
@@ -56,7 +67,12 @@ public class SaferPersonDeserialization {
     // tests for CodeQL
 
     // GOOD
-    private static void testSafeDeserialization() throws Exception {
-        withSocket(input -> deserializeSafe(input, Person.class));
+    private static void testSafeDeserializationWithValidator() throws Exception {
+        withSocket(SaferPersonDeserialization::deserializePersonSafeWithValidator);
+    }
+
+    // GOOD
+    private static void testSafeDeserializationWithValidatorAndBuilder() throws Exception {
+        withSocket(SaferPersonDeserialization::deserializePersonSafeWithValidatorAndBuilder);
     }
 }
