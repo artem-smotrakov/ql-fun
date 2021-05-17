@@ -24,4 +24,9 @@ public class Echo extends UnicastRemoteObject implements EchoInterface {
         return i;
     }
 
+    // this doesn't belong to EchoInterface
+    public Object otherMethod(Object obj) {
+        return new Object();
+    }
+
 }
