@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.security.Security;
 
-public class SaferRmiDeserializationWithFilter {
+public class SaferRmiDeserializationWithProcessWideFilter {
 
     public static void main(String[] args)
             throws RemoteException, MalformedURLException, AlreadyBoundException {
