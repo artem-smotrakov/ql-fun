@@ -45,10 +45,9 @@ public class SaferRmiDeserializationWithObjectInputFilter {
                 }
             }
 
-            System.err.println("DEBUG: " + clazz.getCanonicalName());
             return ObjectInputFilter.Status.REJECTED;
         };
-        Naming.bind("echo", UnicastRemoteObject.exportObject(new Echo(), 12345, filter));
+        Naming.bind("worker", UnicastRemoteObject.exportObject(new WorkerImpl(), 12345, filter));
         System.out.println("okay");
     }
 }
