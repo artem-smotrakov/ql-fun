@@ -5,7 +5,6 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.security.Security;
 
 public class SaferRmiDeserializationWithProcessWideFilter {
 
@@ -19,7 +18,7 @@ public class SaferRmiDeserializationWithProcessWideFilter {
         System.out.println("okay");
 
         System.out.print("[+] Bind an object ... ");
-        Naming.bind("echo", new Echo());
+        Naming.bind("echo", new EchoImpl());
         System.out.println("okay");
     }
 }

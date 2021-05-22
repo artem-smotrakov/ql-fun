@@ -6,7 +6,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
-public class UnsafeRmiDeserialization {
+public class UnsafeEchoRmiDeserialization {
 
     public static void main(String[] args)
             throws RemoteException, MalformedURLException, AlreadyBoundException {
@@ -16,7 +16,7 @@ public class UnsafeRmiDeserialization {
         System.out.println("okay");
 
         System.out.print("[+] Bind an object ... ");
-        Naming.bind("echo", new Echo());
+        Naming.bind("echo", new EchoImpl());
         System.out.println("okay");
     }
 }

@@ -6,19 +6,17 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class EchoClient {
+public class WorkerClient {
 
     public static void main(String... args) throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
-        Echo echo = (Echo) registry.lookup("echo");
-        System.out.println("echo.echoInt(42) = " + echo.echoInteger(42));
-        System.out.println("echo.echoInt(\"xyz\") = " + echo.echoString("xyz"));
+        Worker worker = (Worker) registry.lookup("worker");
         Object o = new Serializable() {
             @Override
             public String toString() {
                 return "serialized object";
             }
         };
-        System.out.println("echo.echoObject(o) = " + echo.echoObject(o));
+        System.out.println("worker.process(o) = " + worker.process(o));
     }
 }
