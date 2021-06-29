@@ -2,7 +2,7 @@ package com.gypsyengineer.ql.fun.java.dos;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -10,12 +10,17 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UnsafeArrayAllocation {
 
     // below are tests for CodeQL queries
 
-    public void unsafeByteArrayAllocation(Socket socket) throws IOException {
+    private static final int MAX_SIZE = 100;
+
+    // BAD: array size comes from remote user input
+    public void unsafeArrayAllocation(Socket socket) throws IOException {
         try (InputStream is = socket.getInputStream()) {
             byte[] data = new byte[16];
             int n = is.read(data);
@@ -50,6 +55,60 @@ public class UnsafeArrayAllocation {
 
             byte[] arr21 = new byte[ByteBuffer.wrap(data).getShort()];
             byte[] arr22 = new byte[ByteBuffer.wrap(data).getInt()];
+        }
+    }
+
+    // BAD: size of byte buffer comes from remote user input
+    public void unsafeByteBufferAllocation(Socket socket) throws IOException {
+        try (InputStream is = socket.getInputStream()) {
+            byte[] data = new byte[16];
+            int n = is.read(data);
+            int size = ByteBuffer.wrap(data).getInt();
+            ByteBuffer.allocate(size);
+            ByteBuffer.allocateDirect(size);
+        }
+    }
+
+    // GOOD: size of byte buffer comes from remote user input, but it is sanitized with Math.min()
+    public void safeByteBufferAllocationWithMathMin(Socket socket) throws IOException {
+        try (InputStream is = socket.getInputStream()) {
+            byte[] data = new byte[16];
+            int n = is.read(data);
+            int size = Math.min(ByteBuffer.wrap(data).getInt(), MAX_SIZE);
+            ByteBuffer.allocate(size);
+        }
+    }
+
+    // BAD: list capacity comes from remote user input
+    public void unsafeCollectionAllocation(Socket socket) throws IOException {
+        try (InputStream is = socket.getInputStream()) {
+            byte[] data = new byte[16];
+            is.read(data);
+            int size = ByteBuffer.wrap(data).getInt();
+
+            List<Object> list1 = new ArrayList<>(size);
+            List<Object> list2 = new Vector<>(size);
+            Set<Object> set1 = new HashSet<>(size);
+            Map<Object, Object> map1 = new HashMap<>(size);
+            Map<Object, Object> map2 = new ConcurrentHashMap<>(size);
+        }
+    }
+
+    // BAD: number of copies comes from remote user input
+    public void unsafeCopy(Socket socket) throws IOException {
+        try (InputStream is = socket.getInputStream()) {
+            byte[] data = new byte[16];
+            is.read(data);
+            int n = ByteBuffer.wrap(data).getInt();
+
+            Collections.nCopies(n, new Object());
+        }
+    }
+
+    public static void main(String... args) {
+        List<Object> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            list.add(new ArrayList<>(Integer.MAX_VALUE));
         }
     }
 }
