@@ -7,6 +7,17 @@ import java.util.Arrays;
 
 public class MacTimingAttack {
 
+    public boolean unsafeMacCheckWithArrayEquals(Socket socket) throws Exception {
+        try (InputStream is = socket.getInputStream()) {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            byte[] data = new byte[1024];
+            is.read(data);
+            byte[] actualMac = mac.doFinal(data);
+            byte[] expectedMac = is.readNBytes(32);
+            return Arrays.equals(expectedMac, actualMac);
+        }
+    }
+
     public boolean unsafeMacCheckWithArraysEquals(Socket socket) throws Exception {
         try (InputStream is = socket.getInputStream()) {
             byte[] data = new byte[256];
